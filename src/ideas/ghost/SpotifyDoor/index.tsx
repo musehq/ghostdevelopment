@@ -1,13 +1,13 @@
-import { GroupProps } from "@react-three/fiber";
-import React from "react";
+import { SpotifyAuthInitiator } from "spotify-auth/spotify-auth-intiator";
 import LoginForm from "./ideas/LoginForm";
 
+const initiator = new SpotifyAuthInitiator();
+
 export default function SpotifyDoor() {
-  return (
-    <LoginForm
-      logo="https://i.scdn.co/image/ab67757000003b8255c25988a6ac314394d3fbf5"
-      content="log in with spotify"
-      visible={true}
-    />
-  );
+  // const fetcher = new SpotifyAccessTokenFetcher();
+  // const url = new URL(window.location.href);
+  // const code = url.searchParams.get("code") as string;
+  // fetcher.fetchAccessToken(code).then(console.log);
+
+  return <LoginForm onClick={initiator.initiate.bind(initiator)} />;
 }
