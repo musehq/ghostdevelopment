@@ -24,6 +24,10 @@ export class PKCEHandler {
     return localStorage.getItem(this.LOCAL_STORAGE_KEY);
   }
 
+  clearLocalCodeVerifier() {
+    localStorage.removeItem(this.LOCAL_STORAGE_KEY);
+  }
+
   async digest(data: Uint8Array) {
     return await window.crypto.subtle.digest(this.DIGEST_ALGORITHM, data);
   }
