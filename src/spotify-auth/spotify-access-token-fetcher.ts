@@ -23,7 +23,7 @@ export const useSpotifyAccessTokenFetcher = () => {
       code_verifier: codeVerifier,
     });
     return sendRequest({
-      url: "/api/token",
+      url: "https://accounts.spotify.com/api/token",
       data: body,
       method: "POST",
       headers: {

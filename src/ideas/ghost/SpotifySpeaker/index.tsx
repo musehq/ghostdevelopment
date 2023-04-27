@@ -1,15 +1,17 @@
+import { Html } from "@react-three/drei";
 import { GroupProps } from "@react-three/fiber";
-import Speaker from "ideas/players/Speaker";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import SpotifyPlayer from 'react-spotify-web-playback';
 import useAxios from "spotify-auth/spotify-http-client";
 import { getLocalAccessToken } from "spotify-auth/spotify-token.utils";
 
 type ImageZoomProps = { opacity?: number; password?: string } & GroupProps;
 
+
 export default function SpotifySpeaker(props: ImageZoomProps) {
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const accessToken = getLocalAccessToken();
+  const accessToken = getLocalAccessToken() as string;
   const { response, sendRequest } = useAxios<SpotifySingleTrackResponse>();
+
   useEffect(() => {
     sendRequest({
       method: "GET",
@@ -17,7 +19,9 @@ export default function SpotifySpeaker(props: ImageZoomProps) {
     });
   }, []);
 
-  return <Speaker audioUrl={response?.data.external_urls.spotify} />;
+  return <Html>
+    <SpotifyPlayer token={accessToken} uris={response?.data.uri ?? ""} />;
+  </Html>
 }
 
 interface SpotifySingleTrackResponse {
@@ -26,4 +30,5 @@ interface SpotifySingleTrackResponse {
     spotify: string;
   };
   is_playable?: string;
+  uri: string;
 }
