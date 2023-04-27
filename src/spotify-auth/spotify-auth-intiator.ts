@@ -22,7 +22,7 @@ export class SpotifyAuthInitiator {
       code_challenge: codeChallenge,
     });
 
-    const url = `${spotifyEnvironment.spotifyBaseURL}/authorize?${args}`;
+    const url = `https://accounts.spotify.com/authorize?${args}`;
     window.location.replace(url);
   }
 }

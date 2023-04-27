@@ -1,87 +1,66 @@
-import { Html } from "@react-three/drei";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import { Collidable } from "spacesvr";
 import { useSpotifyAccessTokenFetcher } from "spotify-auth/spotify-access-token-fetcher";
 import { SpotifyAuthInitiator } from "spotify-auth/spotify-auth-intiator";
 import { getLocalAccessToken } from "spotify-auth/spotify-token.utils";
+import ERROR from "./ideas/Error";
+import Loading from "./ideas/Loading";
+import Loggedin from "./ideas/Loggedin";
 import LoginForm from "./ideas/LoginForm";
 
 enum State {
   CODE,
   ACCESS_TOKEN,
   LOGGED_IN,
-  ERROR
+  ERROR,
 }
 
-function Loader() {
-  return (
-    <Collidable>
-      <Html transform>
-        <p>Loading</p>
-      </Html>
-    </Collidable>
-  )
-}
-
-
-function Loggedin() {
-  return (
-    <Collidable>
-      <Html transform>
-        <p>LOGGED IN</p>
-      </Html>
-    </Collidable>
-  )
-}
-
-function Error() {
-  return (
-    <Collidable>
-      <Html transform>
-        <p>Error</p>
-      </Html>
-    </Collidable>
-  )
+function Panel(props: { state: keyof typeof State }) {
+  const initiatorRef = useRef(new SpotifyAuthInitiator());
+  const { state } = props;
+  if (state === "CODE") {
+    return (
+      <LoginForm
+        onClick={initiatorRef.current.initiate.bind(initiatorRef.current)}
+      />
+    );
+  } else if (state === "LOGGED_IN") {
+    return <Loggedin />;
+  } else if (state === "ERROR") {
+    return <ERROR />;
+  } else {
+    return <Loading />;
+  }
 }
 
 export default function SpotifyDoor() {
-  const initiatorRef = useRef(new SpotifyAuthInitiator());
-  const [state, setState] = useState<keyof typeof State>("ACCESS_TOKEN");
+  const accessToken = getLocalAccessToken();
+  const [state, setState] = useState<keyof typeof State>(
+    accessToken !== null ? "LOGGED_IN" : "ACCESS_TOKEN"
+  );
   const { fetchAccessToken } = useSpotifyAccessTokenFetcher();
   const router = useRouter();
 
   useEffect(() => {
     const { code, ...routerQuery } = router.query;
-    const accessToken = getLocalAccessToken();
     if (accessToken) {
       setState("LOGGED_IN");
-    }
-    else if (code) {
-      router.replace({
-        query: { ...routerQuery },
-      });
+    } else if (code) {
       fetchAccessToken(code as string)
         .then(() => {
+          router.replace(
+            {
+              query: { ...routerQuery },
+            },
+            {},
+            { shallow: true }
+          );
           setState("LOGGED_IN");
         })
         .catch(() => setState("ERROR"));
-    }
-    else {
+    } else {
       setState("CODE");
     }
-  }, [state, fetchAccessToken, router])
-
-  if (state === "CODE") {
-    return <LoginForm onClick={initiatorRef.current.initiate.bind(initiatorRef.current)} />
-  }
-  else if (state === "LOGGED_IN") {
-    return <Loggedin />;
-  }
-  else if (state === "ERROR") {
-    return <Error />
-  }
-  else {
-    return <Loader />;
-  }
+  }, [state, setState, fetchAccessToken, router]);
+  return <Panel state={state} />;
 }

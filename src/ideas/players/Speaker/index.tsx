@@ -1,8 +1,8 @@
-import { Suspense, useState } from "react";
 import { GroupProps } from "@react-three/fiber";
-import SpeakerModel from "./models/Speaker";
+import { Suspense, useState } from "react";
 import { AudioAnalyser } from "three";
 import Audio from "./components/Audio";
+import SpeakerModel from "./models/Speaker";
 
 type SpeakerProps = {
   audioUrl?: string;
@@ -14,7 +14,7 @@ export default function Speaker(props: SpeakerProps) {
   const {
     audioUrl = "https://d27rt3a60hh1lx.cloudfront.net/audio/nocopyright-lofi-muse.mp3",
     distance = 6,
-    volume = 1, // number from 1 - 5 is recommended (this info can be added in the prop)
+    volume = 5, // number from 1 - 5 is recommended (this info can be added in the prop)
     ...restProps
   } = props;
 

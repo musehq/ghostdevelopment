@@ -1,18 +1,29 @@
-import { useFrame, GroupProps } from "@react-three/fiber";
-import { useState } from "react";
-import React from "react";
-import { animated, config, useSpring } from "@react-spring/three";
-import { Button, TextInput, Image, Collidable } from "spacesvr";
+import { GroupProps } from "@react-three/fiber";
+import Speaker from "ideas/players/Speaker";
+import { useEffect, useState } from "react";
+import useAxios from "spotify-auth/spotify-http-client";
+import { getLocalAccessToken } from "spotify-auth/spotify-token.utils";
 
 type ImageZoomProps = { opacity?: number; password?: string } & GroupProps;
 
-export default function PhotoZoom(props: ImageZoomProps) {
-  const { opacity = 0.6, password = "test", ...restProps } = props;
-  const [stage, setStage] = useState(1);
+export default function SpotifySpeaker(props: ImageZoomProps) {
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const accessToken = getLocalAccessToken();
+  const { response, sendRequest } = useAxios<SpotifySingleTrackResponse>();
+  useEffect(() => {
+    sendRequest({
+      method: "GET",
+      url: "/v1/tracks/2HZLXBOnaSRhXStMLrq9fD",
+    });
+  }, []);
 
-  return (
-    <group name="door">
-      <Image src="" />
-    </group>
-  );
+  return <Speaker audioUrl={response?.data.external_urls.spotify} />;
+}
+
+interface SpotifySingleTrackResponse {
+  id: string;
+  external_urls: {
+    spotify: string;
+  };
+  is_playable?: string;
 }

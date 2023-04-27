@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
 import { GroupProps, useThree } from "@react-three/fiber";
+import { useEffect, useRef, useState } from "react";
 import { AudioAnalyser, AudioListener, PositionalAudio } from "three";
 
 type MusicProps = {
@@ -43,6 +43,7 @@ export default function Audio(props: MusicProps) {
       audioElement.crossOrigin = "Anonymous";
       audioElement.loop = true;
       audioElement.play().then(() => {
+        console.log("Play");
         // sync audio in case the same audio is uploaded elsewhere
         audioElement.currentTime =
           clock.getElapsedTime() % audioElement.duration;
