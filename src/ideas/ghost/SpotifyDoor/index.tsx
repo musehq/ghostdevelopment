@@ -8,6 +8,7 @@ import Loading from "./ideas/Loading";
 import Loggedin from "./ideas/Loggedin";
 import LoginForm from "./ideas/LoginForm";
 
+
 enum State {
   CODE,
   ACCESS_TOKEN,
@@ -62,5 +63,6 @@ export default function SpotifyDoor() {
       setState("CODE");
     }
   }, [state, setState, fetchAccessToken, router]);
-  return <Panel state={state} />;
+  return <>
+    <Panel state={state} /></>
 }
