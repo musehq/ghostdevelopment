@@ -8,6 +8,6 @@ const Idea = dynamic(import("ideas/ghost/SpotifySpeaker"), { ssr: false });
 
 export default () => (
   <DeveloperReality>
-    <Idea />
+    <Idea songId="2HZLXBOnaSRhXStMLrq9fD" />
   </DeveloperReality>
 );
