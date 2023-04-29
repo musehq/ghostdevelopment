@@ -9,13 +9,16 @@ export const useSpotifyUserInfo = () => {
     return sendRequest({
       url: "/v1/me",
     }).then(response => {
-      if (response?.data.country && response.data.display_name) {
+      if (response?.data) {
         const info = {
           country: response?.data.country,
-          display_name: response?.data.display_name
+          display_name: response?.data.display_name,
+          email: response?.data.email
         }
-        setUserInfo(info);
-        return info;
+        if (Object.values(info).every(value => value)) {
+          setUserInfo(info);
+          return info;
+        }
       }
       return null;
     });
@@ -27,5 +30,6 @@ export const useSpotifyUserInfo = () => {
 
 interface SpotifyUSerInfoResponse {
   display_name: string;
+  email: string;
   country: string;
 }
