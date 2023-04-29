@@ -1,19 +1,33 @@
 const LOCAL_STORAGE_TOKEN_KEY = "ACCESS_TOKEN";
 
-/**
- *
- * @description Providing the value as null will remove the access token from the local storage
- */
-export function setLocalAccessToken(token?: string | null) {
-    if (token) {
-        localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, token);
-    } else {
-        localStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY);
+interface TokensInterface { token: string, refreshToken: string }
+
+export function removeLocalAccessToken() {
+    localStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY);
+}
+
+export function setLocalAccessToken(tokens: TokensInterface) {
+    localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, JSON.stringify(tokens));
+}
+
+function extractLocalAccessToken() {
+    const tokens = localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY);
+    if (tokens) {
+        try {
+            return JSON.parse(tokens) as TokensInterface
+        } catch {
+            removeLocalAccessToken();
+        }
     }
+    return null;
 }
 
 export function getLocalAccessToken() {
-    const token = localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY);
-    return token;
+    const tokens = extractLocalAccessToken();
+    return tokens?.token;
+}
 
+export function getLocalRefreshToken() {
+    const tokens = extractLocalAccessToken();
+    return tokens?.refreshToken;
 }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import useAxios from "spotify-auth/spotify-http-client";
+import useAxios from "spotify-auth/spotify-http-client/spotify-http-client";
 
 export const useSpotifyUserInfo = () => {
   const { sendRequest } = useAxios<SpotifyUSerInfoResponse>();

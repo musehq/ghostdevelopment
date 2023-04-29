@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import { useSpotifyAccessTokenFetcher } from "spotify-auth/spotify-access-token-fetcher";
 import { SpotifyAuthInitiator } from "spotify-auth/spotify-auth-intiator";
+import { useSpotifyAccessTokenFetcher } from "spotify-auth/spotify-auth-token/spotify-access-token-fetcher";
 import { getLocalAccessToken } from "spotify-auth/spotify-token.utils";
 import ERROR from "./ideas/Error";
 import Loading from "./ideas/Loading";
@@ -18,6 +18,7 @@ enum State {
 
 function Panel(props: { state: keyof typeof State }) {
   const initiatorRef = useRef(new SpotifyAuthInitiator());
+
   const { state } = props;
   if (state === "CODE") {
     return (
@@ -36,6 +37,7 @@ function Panel(props: { state: keyof typeof State }) {
 
 export default function SpotifyDoor() {
   const accessToken = getLocalAccessToken();
+
   const [state, setState] = useState<keyof typeof State>(
     accessToken !== null ? "LOGGED_IN" : "ACCESS_TOKEN"
   );

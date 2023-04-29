@@ -2,7 +2,7 @@ import { Html } from "@react-three/drei";
 import { GroupProps } from "@react-three/fiber";
 import { useEffect, useState } from "react";
 import SpotifyPlayer from 'react-spotify-web-playback';
-import useAxios from "spotify-auth/spotify-http-client";
+import useAxios from "spotify-auth/spotify-http-client/spotify-http-client";
 import { getLocalAccessToken } from "spotify-auth/spotify-token.utils";
 import { Vector3 } from "three";
 import { calculateDistance } from "utils/geometry.utils";
@@ -17,7 +17,6 @@ export default function SpotifySpeaker(props: SpotifySpeakerProps) {
   const accessToken = getLocalAccessToken();
   const [isPlaying, setIsPlaying] = useState(false);
   const { response, sendRequest } = useAxios<SpotifySingleTrackResponse>();
-  console.log(distance)
 
   useEffect(() => {
     const playOnClick = () => {
