@@ -1,16 +1,24 @@
 import { Html } from "@react-three/drei";
+import { GroupProps } from "@react-three/fiber";
 import { useEffect, useState } from "react";
 import SpotifyPlayer from 'react-spotify-web-playback';
 import useAxios from "spotify-auth/spotify-http-client";
 import { getLocalAccessToken } from "spotify-auth/spotify-token.utils";
+import { Vector3 } from "three";
+import { calculateDistance } from "utils/geometry.utils";
 
-type SpotifySpeakerProps = { songId?: string; };
+
+type SpotifySpeakerProps = { songId?: string; centerPosition: Vector3, radius: number } & GroupProps;
 
 
 export default function SpotifySpeaker(props: SpotifySpeakerProps) {
+  const { songId, centerPosition, position, radius } = props;
+  const distance = calculateDistance(centerPosition, position as Vector3);
   const accessToken = getLocalAccessToken();
   const [isPlaying, setIsPlaying] = useState(false);
   const { response, sendRequest } = useAxios<SpotifySingleTrackResponse>();
+
+
   useEffect(() => {
     const playOnClick = () => {
       setIsPlaying(true);
@@ -24,15 +32,19 @@ export default function SpotifySpeaker(props: SpotifySpeakerProps) {
     if (accessToken) {
       sendRequest({
         method: "GET",
-        url: `/v1/tracks/${props.songId}`,
+        url: `/v1/tracks/${songId}`,
       });
     }
-  }, [accessToken, props]);
+  }, [accessToken, songId]);
 
   return (
     (accessToken && response?.data.uri) ?
-      <Html style={{ display: "none" }}>
-        <SpotifyPlayer hideAttribution={true} hideCoverArt={true} play={isPlaying} token={accessToken} uris={response?.data.uri ?? ""} />;
+      <Html style={{ width: "40rem" }}>
+        <SpotifyPlayer callback={(state) => {
+          console.log(state)
+        }}
+          offset={.98}
+          hideAttribution={true} hideCoverArt={true} play={isPlaying && distance <= radius} token={accessToken} uris={response?.data.uri ?? ""} />;
       </Html> : <></>
   );
 }

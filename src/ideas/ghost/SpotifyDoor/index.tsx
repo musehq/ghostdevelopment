@@ -62,7 +62,7 @@ export default function SpotifyDoor() {
     } else {
       setState("CODE");
     }
-  }, [state, setState, fetchAccessToken, router]);
+  }, []);
   return <>
     <Panel state={state} /></>
 }
