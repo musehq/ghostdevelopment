@@ -17,7 +17,7 @@ export default function SpotifySpeaker(props: SpotifySpeakerProps) {
   const accessToken = getLocalAccessToken();
   const [isPlaying, setIsPlaying] = useState(false);
   const { response, sendRequest } = useAxios<SpotifySingleTrackResponse>();
-
+  console.log(distance)
 
   useEffect(() => {
     const playOnClick = () => {
@@ -39,12 +39,8 @@ export default function SpotifySpeaker(props: SpotifySpeakerProps) {
 
   return (
     (accessToken && response?.data.uri) ?
-      <Html style={{ width: "40rem" }}>
-        <SpotifyPlayer callback={(state) => {
-          console.log(state)
-        }}
-          offset={.98}
-          hideAttribution={true} hideCoverArt={true} play={isPlaying && distance <= radius} token={accessToken} uris={response?.data.uri ?? ""} />;
+      <Html style={{ display: "none" }}>
+        <SpotifyPlayer hideAttribution={true} hideCoverArt={true} play={isPlaying && distance <= radius} token={accessToken} uris={response?.data.uri ?? ""} />;
       </Html> : <></>
   );
 }
