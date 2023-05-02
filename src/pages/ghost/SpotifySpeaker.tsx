@@ -9,6 +9,6 @@ const Idea = dynamic(import("ideas/ghost/SpotifySpeaker"), { ssr: false });
 
 export default () => (
   <DeveloperReality>
-    <Idea radius={.8} position={new Vector3(1.1, 1.1, 1.1)} centerPosition={new Vector3(1, 1, 1)} songId="2HZLXBOnaSRhXStMLrq9fD" />
+    <Idea radius={1.8} centerPosition={new Vector3(1, 1, 1)} songId="2HZLXBOnaSRhXStMLrq9fD" />
   </DeveloperReality>
 );

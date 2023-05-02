@@ -1,22 +1,35 @@
 import { Html } from "@react-three/drei";
-import { GroupProps } from "@react-three/fiber";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import SpotifyPlayer from 'react-spotify-web-playback';
+import { useLimitedFrame, usePlayer } from "spacesvr";
 import useAxios from "spotify-auth/spotify-http-client/spotify-http-client";
 import { getLocalAccessToken } from "spotify-auth/spotify-token.utils";
 import { Vector3 } from "three";
 import { calculateDistance } from "utils/geometry.utils";
 
 
-type SpotifySpeakerProps = { songId?: string; centerPosition: Vector3, radius: number } & GroupProps;
+type SpotifySpeakerProps = { songId?: string; centerPosition: Vector3, radius: number };
 
 
 export default function SpotifySpeaker(props: SpotifySpeakerProps) {
-  const { songId, centerPosition, position, radius } = props;
-  const distance = calculateDistance(centerPosition, position as Vector3);
-  const accessToken = getLocalAccessToken();
+  const { songId, centerPosition, radius } = props;
+  const player = usePlayer();
+  const position = player.position.get();
+  const accessTokenRef = useRef(getLocalAccessToken());
+
+  const [distance, setDistance] = useState(calculateDistance(centerPosition, position));
   const [isPlaying, setIsPlaying] = useState(false);
   const { response, sendRequest } = useAxios<SpotifySingleTrackResponse>();
+
+  useLimitedFrame(70, () => {
+    const position = player.position.get();
+    const distance = calculateDistance(centerPosition, position);
+    setDistance(distance);
+  })
+  useMemo(() => {
+    console.log(distance);
+    console.log(isPlaying && distance <= radius);
+  }, [isPlaying, distance, radius]);
 
   useEffect(() => {
     const playOnClick = () => {
@@ -28,18 +41,18 @@ export default function SpotifySpeaker(props: SpotifySpeakerProps) {
     document.addEventListener("click", playOnClick);
     document.addEventListener("pointerup", playOnClick);
 
-    if (accessToken) {
+    if (accessTokenRef.current) {
       sendRequest({
         method: "GET",
         url: `/v1/tracks/${songId}`,
       });
     }
-  }, [accessToken, songId]);
+  }, [accessTokenRef, songId]);
 
   return (
-    (accessToken && response?.data.uri) ?
+    (accessTokenRef.current && response?.data.uri) ?
       <Html style={{ display: "none" }}>
-        <SpotifyPlayer hideAttribution={true} hideCoverArt={true} play={isPlaying && distance <= radius} token={accessToken} uris={response?.data.uri ?? ""} />;
+        <SpotifyPlayer hideAttribution={true} hideCoverArt={true} play={isPlaying && distance <= radius} token={accessTokenRef.current} uris={response?.data.uri ?? ""} />;
       </Html> : <></>
   );
 }
