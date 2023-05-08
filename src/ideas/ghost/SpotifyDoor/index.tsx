@@ -1,13 +1,11 @@
-import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import { SpotifyAuthInitiator } from "spotify-auth/spotify-auth-intiator";
-import { useSpotifyAccessTokenFetcher } from "spotify-auth/spotify-auth-token/spotify-access-token-fetcher";
-import { getLocalAccessToken } from "spotify-auth/spotify-token.utils";
+import { SpotifyAuthInitiator } from "./logic/spotify-auth/spotify-auth-intiator";
+import { useSpotifyAccessTokenFetcher } from "./logic/spotify-auth/spotify-auth-token/spotify-access-token-fetcher";
+import { getLocalAccessToken } from "./logic/spotify-auth/spotify-token.utils";
 import ERROR from "./ideas/Error";
 import Loading from "./ideas/Loading";
 import Loggedin from "./ideas/Loggedin";
 import LoginForm from "./ideas/LoginForm";
-
 
 enum State {
   CODE,
@@ -42,22 +40,16 @@ export default function SpotifyDoor() {
     accessToken !== null ? "LOGGED_IN" : "ACCESS_TOKEN"
   );
   const { fetchAccessToken } = useSpotifyAccessTokenFetcher();
-  const router = useRouter();
+  const params = new URLSearchParams(window.location.search);
 
   useEffect(() => {
-    const { code, ...routerQuery } = router.query;
+    const code = params.get("code");
     if (accessToken) {
       setState("LOGGED_IN");
     } else if (code) {
       fetchAccessToken(code as string)
         .then(() => {
-          router.replace(
-            {
-              query: { ...routerQuery },
-            },
-            {},
-            { shallow: true }
-          );
+          window.history.replaceState({}, "", "/");
           setState("LOGGED_IN");
         })
         .catch(() => setState("ERROR"));
@@ -65,6 +57,9 @@ export default function SpotifyDoor() {
       setState("CODE");
     }
   }, []);
-  return <>
-    <Panel state={state} /></>
+  return (
+    <>
+      <Panel state={state} />
+    </>
+  );
 }

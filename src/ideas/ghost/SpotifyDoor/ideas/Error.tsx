@@ -26,7 +26,11 @@ export default function ERROR() {
                 boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 22px 0px",
               }}
             >
-              <img width={180} src="../Spotify_Logo_RGB_Green.png" alt="" />
+              <img
+                width={180}
+                src="https://d27rt3a60hh1lx.cloudfront.net/images/Spotify_Logo_RGB_Green.png"
+                alt=""
+              />
               <h3>Loggedin</h3>
             </div>
           </Html>
