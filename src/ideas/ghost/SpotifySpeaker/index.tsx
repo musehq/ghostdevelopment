@@ -1,35 +1,43 @@
 import { Html } from "@react-three/drei";
 import { useEffect, useMemo, useRef, useState } from "react";
-import SpotifyPlayer from 'react-spotify-web-playback';
+import SpotifyPlayer from "react-spotify-web-playback";
 import { useLimitedFrame, usePlayer } from "spacesvr";
-import useAxios from "spotify-auth/spotify-http-client/spotify-http-client";
-import { getLocalAccessToken } from "spotify-auth/spotify-token.utils";
-import { Vector3 } from "three";
-import { calculateDistance } from "utils/geometry.utils";
+import useAxios from "./logic/spotify-auth/spotify-http-client/spotify-http-client";
+import { getLocalAccessToken } from "./logic/spotify-auth/spotify-token.utils";
+import { calculateDistance } from "./logic/utils/geometry.utils";
+import { GroupProps } from "@react-three/fiber";
+import { Group, Vector3 } from "three";
 
-
-type SpotifySpeakerProps = { songId?: string; centerPosition: Vector3, radius: number };
-
+type SpotifySpeakerProps = {
+  songId?: string;
+  radius: number;
+} & GroupProps;
 
 export default function SpotifySpeaker(props: SpotifySpeakerProps) {
-  const { songId, centerPosition, radius } = props;
+  const { songId, radius, ...rest } = props;
+
   const player = usePlayer();
-  const position = player.position.get();
   const accessTokenRef = useRef(getLocalAccessToken());
 
-  const [distance, setDistance] = useState(calculateDistance(centerPosition, position));
+  const group = useRef<Group>(null);
+  const distance = useRef(0);
+  const [inRange, setInRange] = useState(false);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const { response, sendRequest } = useAxios<SpotifySingleTrackResponse>();
+  const [dummy] = useState(new Vector3());
 
   useLimitedFrame(70, () => {
+    if (!group.current) return;
     const position = player.position.get();
-    const distance = calculateDistance(centerPosition, position);
-    setDistance(distance);
-  })
-  useMemo(() => {
-    console.log(distance);
-    console.log(isPlaying && distance <= radius);
-  }, [isPlaying, distance, radius]);
+    group.current.getWorldPosition(dummy);
+    distance.current = calculateDistance(dummy, position);
+    if (distance.current < radius) {
+      setInRange(true);
+    } else {
+      setInRange(false);
+    }
+  });
 
   useEffect(() => {
     const playOnClick = () => {
@@ -50,10 +58,26 @@ export default function SpotifySpeaker(props: SpotifySpeakerProps) {
   }, [accessTokenRef, songId]);
 
   return (
-    (accessTokenRef.current && response?.data.uri) ?
-      <Html style={{ display: "none" }}>
-        <SpotifyPlayer hideAttribution={true} hideCoverArt={true} play={isPlaying && distance <= radius} token={accessTokenRef.current} uris={response?.data.uri ?? ""} />;
-      </Html> : <></>
+    <group ref={group} {...rest}>
+      <mesh>
+        <boxBufferGeometry args={[0.1, 0.1, 0.1]} />
+        <meshStandardMaterial color="green" />
+      </mesh>
+      {accessTokenRef.current && response?.data.uri ? (
+        <Html style={{ display: "none" }}>
+          <SpotifyPlayer
+            hideAttribution={true}
+            hideCoverArt={true}
+            play={isPlaying && inRange}
+            token={accessTokenRef.current}
+            uris={response?.data.uri ?? ""}
+          />
+          ;
+        </Html>
+      ) : (
+        <></>
+      )}
+    </group>
   );
 }
 

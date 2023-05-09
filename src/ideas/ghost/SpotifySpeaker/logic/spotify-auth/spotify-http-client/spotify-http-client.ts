@@ -1,8 +1,8 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { useState } from "react";
-import spotifyEnvironment from "spotify-auth/spotify-environment";
-import { refreshAccessTokenIfExpiredInterceptor } from "spotify-auth/spotify-http-client/refresh-access-token-if-expired.intercepter";
-import { setAccessTokenIfAvailableOnRequestInterceptor } from "spotify-auth/spotify-http-client/set-access-token.intercepter";
+import spotifyEnvironment from "../spotify-environment";
+import { refreshAccessTokenIfExpiredInterceptor } from "../spotify-http-client/refresh-access-token-if-expired.intercepter";
+import { setAccessTokenIfAvailableOnRequestInterceptor } from "../spotify-http-client/set-access-token.intercepter";
 
 const client = axios.create({
   baseURL: spotifyEnvironment.spotifyBaseURL,
@@ -13,8 +13,13 @@ const useAxios = <T>() => {
   const [error, setError] = useState<AxiosError>();
   const [loading, setLoading] = useState(true);
 
-  client.interceptors.request.use(setAccessTokenIfAvailableOnRequestInterceptor);
-  client.interceptors.response.use((response) => response, (err) => refreshAccessTokenIfExpiredInterceptor(err, client));
+  client.interceptors.request.use(
+    setAccessTokenIfAvailableOnRequestInterceptor
+  );
+  client.interceptors.response.use(
+    (response) => response,
+    (err) => refreshAccessTokenIfExpiredInterceptor(err, client)
+  );
 
   const sendRequest = async (axiosParams: AxiosRequestConfig) => {
     try {
@@ -33,5 +38,3 @@ const useAxios = <T>() => {
 };
 
 export default useAxios;
-
-

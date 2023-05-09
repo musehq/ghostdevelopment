@@ -1,18 +1,18 @@
 import { useRef, useState } from "react";
-import { SpotifyAccessTokenResponse } from "spotify-auth/spotify-auth-token/spotify-access-token-response.interface";
-import { parseSpoitifyAccessTokenResponse } from "spotify-auth/spotify-auth-token/spotify-access-token-response.praser";
-import useAxios from "spotify-auth/spotify-http-client/spotify-http-client";
-import { setLocalAccessToken } from "spotify-auth/spotify-token.utils";
+import { SpotifyAccessTokenResponse } from "../spotify-auth-token/spotify-access-token-response.interface";
+import { parseSpoitifyAccessTokenResponse } from "../spotify-auth-token/spotify-access-token-response.praser";
+import useAxios from "../spotify-http-client/spotify-http-client";
+import { setLocalAccessToken } from "../spotify-token.utils";
 import { PKCEHandler } from "../pkce-handler";
 import spotifyEnvironment from "../spotify-environment";
-
 
 export const useSpotifyAccessTokenFetcher = () => {
   const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
   const { sendRequest } = useAxios<SpotifyAccessTokenResponse>();
   const pkceVerifierRef = useRef(new PKCEHandler());
   const fetchAccessToken = (code: string) => {
-    const codeVerifier = pkceVerifierRef.current.retrieveCodeVerifier() as string;
+    const codeVerifier =
+      pkceVerifierRef.current.retrieveCodeVerifier() as string;
 
     const body = new URLSearchParams({
       grant_type: "authorization_code",

@@ -6,6 +6,7 @@ import ERROR from "./ideas/Error";
 import Loading from "./ideas/Loading";
 import Loggedin from "./ideas/Loggedin";
 import LoginForm from "./ideas/LoginForm";
+import { GroupProps } from "@react-three/fiber";
 
 enum State {
   CODE,
@@ -33,7 +34,9 @@ function Panel(props: { state: keyof typeof State }) {
   }
 }
 
-export default function SpotifyDoor() {
+export default function SpotifyDoor(props: GroupProps) {
+  const { ...rest } = props;
+
   const accessToken = getLocalAccessToken();
 
   const [state, setState] = useState<keyof typeof State>(
@@ -58,8 +61,8 @@ export default function SpotifyDoor() {
     }
   }, []);
   return (
-    <>
+    <group {...rest}>
       <Panel state={state} />
-    </>
+    </group>
   );
 }

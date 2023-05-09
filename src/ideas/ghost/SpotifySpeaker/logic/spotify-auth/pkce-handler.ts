@@ -33,10 +33,32 @@ export class PKCEHandler {
   }
 
   base64encode(data: ArrayBuffer) {
-    return btoa(String.fromCharCode.apply(null, [...new Uint8Array(data)]))
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_")
-      .replace(/=+$/, "");
+    if (!data || !(data instanceof ArrayBuffer)) {
+      throw new Error("Invalid input data");
+    }
+
+    let encodedString;
+    try {
+      const utf8String = new TextDecoder().decode(data);
+      encodedString = btoa(utf8String);
+    } catch (err) {
+      // @ts-ignore
+      throw new Error("Failed to encode data: " + err.message);
+    }
+
+    if (typeof encodedString !== "string") {
+      throw new Error("Invalid encoded string");
+    }
+
+    encodedString = encodedString.replace(/\+/g, "-");
+    encodedString = encodedString.replace(/\//g, "_");
+    encodedString = encodedString.replace(/=+$/, "");
+
+    if (!encodedString) {
+      throw new Error("Empty encoded string");
+    }
+
+    return encodedString;
   }
 
   async generateAndSaveCodeChallenge() {
