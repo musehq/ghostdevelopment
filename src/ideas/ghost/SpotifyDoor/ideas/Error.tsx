@@ -34,7 +34,6 @@ export default function ERROR() {
               <h3>Loggedin</h3>
             </div>
           </Html>
-          <meshStandardMaterial color="#000000" roughness={1} />
         </animated.group>
       </Collidable>
     </group>
